@@ -95,7 +95,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     
     static final int          DEFAULT_WIDTH              = 1200;
     static final int          DEFAULT_HEIGHT             = 720;
-    static final int          MIN_WIDTH                  = 1100;
+    static final int          MIN_WIDTH                  = 1100; 
     static final int          MIN_HEIGHT                 = 500;
     
     static final int          DEVICES_ANDROID            = 0;
