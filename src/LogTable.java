@@ -557,7 +557,7 @@ public class LogTable extends JTable implements FocusListener, ActionListener
                         newText += "</b></span>";
                     else
                         newText += "</b></font>";
-                    strText = strText.replace(strToken, newText);
+                    strText = strText.replaceAll("(?i)" + strToken, newText);
                     m_bChanged = true;
                     nIndex++;
                 }
