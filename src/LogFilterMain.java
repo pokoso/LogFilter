@@ -44,6 +44,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -88,10 +89,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
 //    final String              ANDROID_EVENT_CMD          = "logcat -b events -v time ";
 //    final String              ANDROID_RADIO_CMD          = "logcat -b radio -v time          ";
 //    final String              ANDROID_CUSTOM_CMD         = "logcat ";
-    final String              ANDROID_DEFAULT_CMD_FIRST  = "adb ";
-    final String              ANDROID_SELECTED_CMD_FIRST = "adb -s ";
 //    final String              ANDROID_SELECTED_CMD_LAST  = " logcat -v time ";
-    final String[]            DEVICES_CMD                = {"adb devices", "", ""};
+    final String[]            DEVICES_CMD                = {" devices", "", ""};
     
     static final int          DEFAULT_WIDTH              = 1200;
     static final int          DEFAULT_HEIGHT             = 720;
@@ -130,6 +129,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     boolean                   m_bUserFilter;
     
     //Word Filter, tag filter
+    JTextField                m_tfAdbPath;
     JTextField                m_tfHighlight;
     JTextField                m_tfFindWord;
     JTextField                m_tfRemoveWord;
@@ -139,6 +139,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     JTextField                m_tfShowTid;
     
     //Device
+    JButton                   m_btnAdbPath;
     JButton                   m_btnDevice;
     JList                     m_lDeviceList;
     JComboBox                 m_comboDeviceCmd;
@@ -184,7 +185,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     
     String                    m_strLogFileName;
     String                    m_strSelectedDevice;
-//    String                      m_strProcessCmd;
+    String                    m_strAdbPath;
     Process                   m_Process;
     Thread                    m_thProcess;
     Thread                    m_thWatchFile;
@@ -314,6 +315,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     final String INI_FILE           = "LogFilter.ini";
     final String INI_FILE_CMD       = "LogFilterCmd.ini";
     final String INI_FILE_COLOR     = "LogFilterColor.ini";
+    final String INI_ADB_PATH       = "ADB_PATH";
     final String INI_LAST_DIR       = "LAST_DIR";
     final String INI_CMD_COUNT      = "CMD_COUNT";
     final String INI_CMD            = "CMD_";
@@ -447,6 +449,11 @@ public class LogFilterMain extends JFrame implements INotiEvent
             String strFontType = p.getProperty(INI_FONT_TYPE);
             if(strFontType != null && strFontType.length() > 0)
                 m_jcFontType.setSelectedItem(p.getProperty(INI_FONT_TYPE));
+            m_strAdbPath = p.getProperty(INI_ADB_PATH);
+            if(m_strAdbPath.isEmpty())
+            	m_tfAdbPath.setText("/Users/username/Library/Android/sdk/platform-tools/adb");
+            else
+            	m_tfAdbPath.setText(m_strAdbPath);
             m_tfFindWord.setText(p.getProperty(INI_WORD_FIND));
             m_tfRemoveWord.setText(p.getProperty(INI_WORD_REMOVE));
             m_tfShowTag.setText(p.getProperty(INI_TAG_SHOW));
@@ -480,6 +487,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
             
             Properties p = new Properties();
 //            p.setProperty( INI_LAST_DIR, m_strLastDir );
+            
+            p.setProperty(INI_ADB_PATH,    m_strAdbPath);
             p.setProperty(INI_FONT_TYPE,   (String)m_jcFontType.getSelectedItem());
             p.setProperty(INI_WORD_FIND,   m_tfFindWord.getText());
             p.setProperty(INI_WORD_REMOVE, m_tfRemoveWord.getText());
@@ -625,11 +634,18 @@ public class LogFilterMain extends JFrame implements INotiEvent
         jpOptionDevice.setLayout(new BorderLayout());
 //        jpOptionDevice.setPreferredSize(new Dimension(200, 100));
 
+        JPanel jpDevicePath = new JPanel();
+        m_tfAdbPath = new JTextField("", 10);
+        m_btnAdbPath = new JButton("Set");
+        m_btnAdbPath.addActionListener(m_alButtonListener);
+        jpDevicePath.add(new JLabel("Path:"));
+        jpDevicePath.add(m_tfAdbPath);
+        jpDevicePath.add(m_btnAdbPath);
+        jpOptionDevice.add(jpDevicePath, BorderLayout.NORTH);
+        
         JPanel jpCmd = new JPanel();
         m_comboDeviceCmd = new JComboBox();
         m_comboDeviceCmd.addItem(COMBO_ANDROID);
-//        m_comboDeviceCmd.addItem(COMBO_IOS);
-//        m_comboDeviceCmd.addItem(CUSTOM_COMMAND);
         m_comboDeviceCmd.addItemListener(new ItemListener()
         {
             public void itemStateChanged(ItemEvent e)
@@ -655,7 +671,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
         jpCmd.add(m_comboDeviceCmd);
         jpCmd.add(m_btnDevice);
 
-        jpOptionDevice.add(jpCmd, BorderLayout.NORTH);
+        jpOptionDevice.add(jpCmd, BorderLayout.SOUTH);
 
         m_lDeviceList = new JList(listModel);
         JScrollPane vbar = new JScrollPane(m_lDeviceList);
@@ -676,7 +692,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
                 }
             }
         });
-        jpOptionDevice.add(vbar);
+        jpOptionDevice.add(vbar, BorderLayout.CENTER);
 
         return jpOptionDevice;
     }
@@ -1254,7 +1270,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
         {
             listModel.clear();
             String s;
-            String strCommand = DEVICES_CMD[m_comboDeviceCmd.getSelectedIndex()];
+            String strCommand = m_strAdbPath + DEVICES_CMD[m_comboDeviceCmd.getSelectedIndex()];
             if(m_comboDeviceCmd.getSelectedIndex() == DEVICES_CUSTOM)
                 strCommand = (String)m_comboDeviceCmd.getSelectedItem();
             Process oProcess = Runtime.getRuntime().exec(strCommand);
@@ -1381,10 +1397,9 @@ public class LogFilterMain extends JFrame implements INotiEvent
     String getProcessCmd()
     {
         if(m_lDeviceList.getSelectedIndex() < 0)
-            return ANDROID_DEFAULT_CMD_FIRST + m_comboCmd.getSelectedItem();
-//            return ANDROID_DEFAULT_CMD_FIRST + m_comboCmd.getSelectedItem() + makeFilename();
+            return m_strAdbPath + " " + m_comboCmd.getSelectedItem();
         else
-            return ANDROID_SELECTED_CMD_FIRST + m_strSelectedDevice + m_comboCmd.getSelectedItem();
+            return m_strAdbPath + " -s " + m_strSelectedDevice + m_comboCmd.getSelectedItem();
     }
 
     void setProcessCmd(int nType, String strSelectedDevice)
@@ -1865,8 +1880,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
         {
             if(e.getSource().equals(m_btnDevice))
                 setDeviceList();
-            else if(e.getSource().equals(m_btnSetFont))
-            {
+            else if(e.getSource().equals(m_btnSetFont)) {
                 m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
                 updateTable(-1, false);
             }
@@ -1894,6 +1908,10 @@ public class LogFilterMain extends JFrame implements INotiEvent
                 
                 m_tbLogTable.setFont(new Font((String)m_jcFontType.getSelectedItem(), Font.PLAIN, 12));
                 m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
+            }
+            else if(e.getSource().equals(m_btnAdbPath)) {
+            	m_strAdbPath = m_tfAdbPath.getText();
+            	saveFilter();
             }
         }
     };
@@ -2060,25 +2078,11 @@ public class LogFilterMain extends JFrame implements INotiEvent
     public void openFileBrowser()
     {
         FileDialog fd = new FileDialog(this, "File open", FileDialog.LOAD); 
-//        fd.setDirectory( m_strLastDir );
         fd.setVisible( true );
-        if (fd.getFile() != null)
-        {
+        if (fd.getFile() != null) {
             parseFile(new File(fd.getDirectory() + fd.getFile()));
             m_recentMenu.addEntry( fd.getDirectory() + fd.getFile() );
         }
-
-        //In response to a button click:
-//        final JFileChooser fc = new JFileChooser(m_strLastDir);
-//        int returnVal = fc.showOpenDialog(this);
-//        if (returnVal == JFileChooser.APPROVE_OPTION)
-//        {
-//            File file = fc.getSelectedFile();
-//            m_strLastDir = fc.getCurrentDirectory().getAbsolutePath();
-//            T.d("file = " + file.getAbsolutePath());
-//            parseFile(file);
-//            m_recentMenu.addEntry( file.getAbsolutePath() );
-//        }
     }
 }
 
