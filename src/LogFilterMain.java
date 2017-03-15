@@ -76,6 +76,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
 {
     private static final long serialVersionUID           = 1L;
     
+    private static int _processCount = 0;
+    
     static final String       LOGFILTER                  = "LogFilter";
     static final String       VERSION                    = "Version 1.8";
     final String              COMBO_ANDROID              = "Android          ";
@@ -213,8 +215,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
 //        mainFrame.addWindowListener(new WindowEventHandler());
 
         JMenuBar menubar = new JMenuBar();
-        JMenu file = new JMenu("File");
-        file.setMnemonic(KeyEvent.VK_F);
+        JMenu jMenufile = new JMenu("File");
+        jMenufile.setMnemonic(KeyEvent.VK_F);
 
         JMenuItem fileOpen = new JMenuItem("Open");
         fileOpen.setMnemonic(KeyEvent.VK_O);
@@ -227,16 +229,24 @@ public class LogFilterMain extends JFrame implements INotiEvent
             }
         });
         
-        m_recentMenu = new RecentFileMenu("RecentFile",10){
+        m_recentMenu = new RecentFileMenu("RecentFile", 10) {
             public void onSelectFile(String filePath){
                 mainFrame.parseFile(new File(filePath));
             }
         };
-        
-        file.add(fileOpen);
-        file.add(m_recentMenu);
 
-        menubar.add(file);
+        JMenuItem menuNewWindow = new JMenuItem("New Window");
+        menuNewWindow.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                main(null);
+            }
+        });
+
+        jMenufile.add(fileOpen);
+        jMenufile.add(m_recentMenu);
+        jMenufile.add(menuNewWindow);
+
+        menubar.add(jMenufile);
         mainFrame.setJMenuBar(menubar);
         
         if(args != null && args.length > 0)
@@ -249,6 +259,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
                 }
             });
         }
+        
+        _processCount++;
     }
 
     String makeFilename()
@@ -267,7 +279,10 @@ public class LogFilterMain extends JFrame implements INotiEvent
 
         saveFilter();
         saveColor();
-        System.exit(0);
+        
+        _processCount--;
+        if(_processCount <= 0)
+        	System.exit(0);
     }
 
     /**
@@ -1894,11 +1909,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
             }
             else if(e.getSource().equals(m_btnClear))
             {
-                boolean bBackup = m_bPauseADB;
-                m_bPauseADB = true;
-                clearData();
-                updateTable(-1, false);
-                m_bPauseADB = bBackup;
+            	onBtnClickClear();
             }
             else if(e.getSource().equals(m_tbtnPause))
                 pauseProcess();
@@ -1915,6 +1926,14 @@ public class LogFilterMain extends JFrame implements INotiEvent
             }
         }
     };
+    
+    public void onBtnClickClear() {
+        boolean bBackup = m_bPauseADB;
+        m_bPauseADB = true;
+        clearData();
+        updateTable(-1, false);
+        m_bPauseADB = bBackup;
+    }
 
     public void notiEvent(EventParam param)
     {
