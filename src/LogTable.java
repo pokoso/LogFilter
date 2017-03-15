@@ -311,7 +311,7 @@ public class LogTable extends JTable implements FocusListener, ActionListener
                 case KeyEvent.VK_HOME:
                     changeSelection(0, 0, false, false);
                     return true;
-                case KeyEvent.VK_F2:
+                case KeyEvent.VK_COMMA:
                     if(e.isControlDown() && e.getID() == KeyEvent.KEY_PRESSED)
                     {
                         int[] arSelectedRow = getSelectedRows();
@@ -325,9 +325,13 @@ public class LogTable extends JTable implements FocusListener, ActionListener
                     else if(!e.isControlDown() && e.getID() == KeyEvent.KEY_PRESSED)
                         gotoPreBookmark();
                     return true;
-                case KeyEvent.VK_F3:
+                case KeyEvent.VK_PERIOD:
                     if(e.getID() == KeyEvent.KEY_PRESSED)
                         gotoNextBookmark();
+                    return true;
+                case KeyEvent.VK_F4:
+                    if(e.getID() == KeyEvent.KEY_PRESSED)
+                    	m_LogFilterMain.onBtnClickClear();
                     return true;
                 case KeyEvent.VK_F:
                     if(e.getID() == KeyEvent.KEY_PRESSED && ( (e.getModifiers() & InputEvent.CTRL_MASK) == InputEvent.CTRL_MASK))

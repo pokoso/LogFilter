@@ -263,11 +263,17 @@ public class LogFilterMain extends JFrame implements INotiEvent
         _processCount++;
     }
 
+    static final String logDir = "Logs";
     String makeFilename()
     {
+    	File desti = new File(logDir);
+    	if(!desti.exists()) {
+    		desti.mkdirs(); 
+    	}
+    	
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        return "LogFilter_" + format.format(now) + ".txt";
+        return logDir + File.separator + "LogFilter_" + format.format(now) + ".txt";
     }
     
     void exit()
