@@ -301,53 +301,62 @@ public class LogTable extends JTable implements FocusListener, ActionListener
     protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed)
     {
         m_bAltPressed = e.isAltDown();
-//        if(e.getID() == KeyEvent.KEY_RELEASED)
-        {
-            switch(e.getKeyCode())
-            {
-                case KeyEvent.VK_END:
-                    changeSelection(getRowCount() - 1, 0, false, false);
-                    return true;
-                case KeyEvent.VK_HOME:
-                    changeSelection(0, 0, false, false);
-                    return true;
-                case KeyEvent.VK_COMMA:
-                    if(e.isControlDown() && e.getID() == KeyEvent.KEY_PRESSED)
-                    {
-                        int[] arSelectedRow = getSelectedRows();
-                        for(int nIndex : arSelectedRow)
-                        {
-                            LogInfo logInfo = ((LogFilterTableModel)getModel()).getRow(nIndex);
-                            logInfo.m_bMarked = !logInfo.m_bMarked;
-                            m_LogFilterMain.bookmarkItem(nIndex, Integer.parseInt(logInfo.m_strLine) - 1, logInfo.m_bMarked);                        }
-                        repaint();
-                    }
-                    else if(!e.isControlDown() && e.getID() == KeyEvent.KEY_PRESSED)
-                        gotoPreBookmark();
-                    return true;
-                case KeyEvent.VK_PERIOD:
-                    if(e.getID() == KeyEvent.KEY_PRESSED)
-                        gotoNextBookmark();
-                    return true;
-                case KeyEvent.VK_F4:
-                    if(e.getID() == KeyEvent.KEY_PRESSED)
-                    	m_LogFilterMain.onBtnClickClear();
-                    return true;
-                case KeyEvent.VK_F:
-                    if(e.getID() == KeyEvent.KEY_PRESSED && ( (e.getModifiers() & InputEvent.CTRL_MASK) == InputEvent.CTRL_MASK))
-                    {
-                        m_LogFilterMain.setFindFocus();
-                        return true;
-                    }
-                    break;
-//                case KeyEvent.VK_O:
-//                    if(e.getID() == KeyEvent.KEY_RELEASED)
-//                    {
-//                        m_LogFilterMain.openFileBrowser();
-//                        return true;
-//                    }
-            }
-        }
+        boolean isMetaDown = e.isMetaDown();
+        
+		switch (e.getKeyCode()) {
+
+		case KeyEvent.VK_DOWN:
+			if(!isMetaDown)
+				break;
+		case KeyEvent.VK_END:
+			changeSelection(getRowCount() - 1, 0, false, false);
+			return true;
+			
+		case KeyEvent.VK_UP:
+			if(!isMetaDown)
+				break;
+		case KeyEvent.VK_HOME:
+			changeSelection(0, 0, false, false);
+			return true;
+			
+		case KeyEvent.VK_COMMA:
+			if (e.isControlDown() && e.getID() == KeyEvent.KEY_PRESSED) {
+				int[] arSelectedRow = getSelectedRows();
+				for (int nIndex : arSelectedRow) {
+					LogInfo logInfo = ((LogFilterTableModel) getModel()).getRow(nIndex);
+					logInfo.m_bMarked = !logInfo.m_bMarked;
+					m_LogFilterMain.bookmarkItem(nIndex, Integer.parseInt(logInfo.m_strLine) - 1, logInfo.m_bMarked);
+				}
+				repaint();
+			} else if (!e.isControlDown() && e.getID() == KeyEvent.KEY_PRESSED)
+				gotoPreBookmark();
+			return true;
+			
+		case KeyEvent.VK_PERIOD:
+			if (e.getID() == KeyEvent.KEY_PRESSED)
+				gotoNextBookmark();
+			return true;
+			
+		case KeyEvent.VK_F4:
+			if (e.getID() == KeyEvent.KEY_PRESSED)
+				m_LogFilterMain.onBtnClickClear();
+			return true;
+			
+		case KeyEvent.VK_F:
+			if (e.getID() == KeyEvent.KEY_PRESSED
+					&& ((e.getModifiers() & InputEvent.CTRL_MASK) == InputEvent.CTRL_MASK)) {
+				m_LogFilterMain.setFindFocus();
+				return true;
+			}
+			break;
+		// case KeyEvent.VK_O:
+		// if(e.getID() == KeyEvent.KEY_RELEASED)
+		// {
+		// m_LogFilterMain.openFileBrowser();
+		// return true;
+		// }
+		}
+        
         return super.processKeyBinding(ks, e, condition, pressed);
     }
 

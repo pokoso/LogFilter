@@ -1597,20 +1597,16 @@ public class LogFilterMain extends JFrame implements INotiEvent
 
     void runFilter()
     {
-        checkUseFilter();
-        while(m_nChangedFilter == STATUS_PARSING)
-            try
-            {
-                Thread.sleep(100);
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-        synchronized(FILTER_LOCK)
-        {
-            FILTER_LOCK.notify();
-        }
+		checkUseFilter();
+		while (m_nChangedFilter == STATUS_PARSING)
+			try {
+				Thread.sleep(100);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		synchronized (FILTER_LOCK) {
+			FILTER_LOCK.notify();
+		}
     }
 
     void startFilterParse()
@@ -1629,6 +1625,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
 
                             m_nChangedFilter = STATUS_PARSING;
 
+                            int nSelectedIndex = m_tbLogTable.getSelectedRow();
+
                             m_arLogInfoFiltered.clear();
                             m_hmBookmarkFiltered.clear();
                             m_hmErrorFiltered.clear();
@@ -1638,13 +1636,15 @@ public class LogFilterMain extends JFrame implements INotiEvent
                             {
                                 m_tmLogTableModel.setData(m_arLogInfoAll);
                                 m_ipIndicator.setData(m_arLogInfoAll, m_hmBookmarkAll, m_hmErrorAll);
-                                updateTable(m_arLogInfoAll.size() - 1, true);
+                                if(nSelectedIndex < m_arLogInfoAll.size() - 1)
+                                	updateTable(nSelectedIndex, false);
+                                else
+                                	updateTable(m_arLogInfoAll.size() - 1, true);
                                 m_nChangedFilter = STATUS_READY;
                                 continue;
                             }
                             m_tmLogTableModel.setData(m_arLogInfoFiltered);
                             m_ipIndicator.setData(m_arLogInfoFiltered, m_hmBookmarkFiltered, m_hmErrorFiltered);
-    //                        updateTable(-1);
                             setStatus("Parsing");
 
                             int nRowCount = m_arLogInfoAll.size();
@@ -1961,10 +1961,10 @@ public class LogFilterMain extends JFrame implements INotiEvent
 
     void updateTable(int nRow, boolean bMove)
     {
+    	T.d("updateTable() = " + nRow + ", " + bMove);
+    	
         m_tmLogTableModel.fireTableRowsUpdated(0, m_tmLogTableModel.getRowCount() - 1);
         m_scrollVBar.validate();
-//        if(nRow >= 0)
-//            m_tbLogTable.changeSelection(nRow, 0, false, false);
         m_tbLogTable.invalidate();
         m_tbLogTable.repaint();
         if(nRow >= 0)
