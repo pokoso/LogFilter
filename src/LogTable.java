@@ -83,8 +83,11 @@ public class LogTable extends JTable implements FocusListener, ActionListener
     }
 
     private void init() {
-        KeyStroke copy = KeyStroke.getKeyStroke(KeyEvent.VK_C,ActionEvent.CTRL_MASK,false);
-        registerKeyboardAction(this,"Copy",copy,JComponent.WHEN_FOCUSED);
+		KeyStroke copy = KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK, false);
+		registerKeyboardAction(this, "Copy", copy, JComponent.WHEN_FOCUSED);
+		
+		KeyStroke copyOnMac = KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.META_MASK, false);
+		registerKeyboardAction(this, "Copy", copyOnMac, JComponent.WHEN_FOCUSED);
 
         addFocusListener( this );
         setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -670,49 +673,48 @@ public class LogTable extends JTable implements FocusListener, ActionListener
         m_bAltPressed = false;
     }
 
-    @Override
-    public void actionPerformed( ActionEvent arg0 )
-    {
-        Clipboard system = Toolkit.getDefaultToolkit().getSystemClipboard();;
-        StringBuffer sbf = new StringBuffer();
-        int numrows = getSelectedRowCount();
-        int[] rowsselected = getSelectedRows();
-//        if ( !( ( numrows - 1 == rowsselected[rowsselected.length - 1] - rowsselected[0] && numrows == rowsselected.length )
-//                && ( numcols - 1 == colsselected[colsselected.length - 1] - colsselected[0] && numcols == colsselected.length ) ) )
-//        {
-//            JOptionPane.showMessageDialog( null, "Invalid Copy Selection", "Invalid Copy Selection", JOptionPane.ERROR_MESSAGE );
-//            return;
-//        }
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		Clipboard system = Toolkit.getDefaultToolkit().getSystemClipboard();
+		StringBuffer sbf = new StringBuffer();
+		int numrows = getSelectedRowCount();
+		int[] rowsselected = getSelectedRows();
+		// if ( !( ( numrows - 1 == rowsselected[rowsselected.length - 1] -
+		// rowsselected[0] && numrows == rowsselected.length )
+		// && ( numcols - 1 == colsselected[colsselected.length - 1] -
+		// colsselected[0] && numcols == colsselected.length ) ) )
+		// {
+		// JOptionPane.showMessageDialog( null, "Invalid Copy Selection",
+		// "Invalid Copy Selection", JOptionPane.ERROR_MESSAGE );
+		// return;
+		// }
 
-        for ( int i = 0; i < numrows; i++ )
-        {
-            for ( int j = 0; j < m_arbShow.length; j++ )
-            {
-                if(!(j == LogFilterTableModel.COMUMN_LINE) && m_arbShow[j])
-                {
-                    StringBuffer strTemp = new StringBuffer((String)getValueAt( rowsselected[i], j ));
-                    if(j == LogFilterTableModel.COMUMN_TAG)
-                    {
-                        String strTag = strTemp.toString();
-                        for(int k = 0; k < m_nTagLength - strTag.length(); k++)
-                            strTemp.append(" ");
-                    }
-                    else if(j == LogFilterTableModel.COMUMN_THREAD || j == LogFilterTableModel.COMUMN_PID)
-                    {
-                        String strTag = strTemp.toString();
-                        for(int k = 0; k < 8 - strTag.length(); k++)
-                            strTemp.append(" ");
-                    }
-                    strTemp.append(" ");
-                    sbf.append( strTemp );
-                }
-            }
-            sbf.append( "\n" );
-        }
-        StringSelection stsel = new StringSelection( sbf.toString() );
-        system = Toolkit.getDefaultToolkit().getSystemClipboard();
-        system.setContents(stsel,stsel);
-    }
+		for (int i = 0; i < numrows; i++) {
+			for (int j = 0; j < m_arbShow.length; j++) {
+				if (!(j == LogFilterTableModel.COMUMN_LINE) && m_arbShow[j]) {
+					if (j == LogFilterTableModel.COMUMN_MESSAGE)
+						sbf.append(new StringBuffer((String) getValueAt(rowsselected[i], j)).substring(1));
+
+//					StringBuffer strTemp = new StringBuffer((String) getValueAt(rowsselected[i], j));
+//					if (j == LogFilterTableModel.COMUMN_TAG) {
+//						String strTag = strTemp.toString();
+//						for (int k = 0; k < m_nTagLength - strTag.length(); k++)
+//							strTemp.append(" ");
+//					} else if (j == LogFilterTableModel.COMUMN_THREAD || j == LogFilterTableModel.COMUMN_PID) {
+//						String strTag = strTemp.toString();
+//						for (int k = 0; k < 8 - strTag.length(); k++)
+//							strTemp.append(" ");
+//					}
+//					strTemp.append(" ");
+//					sbf.append(strTemp);
+				}
+			}
+			sbf.append("\n");
+		}
+		StringSelection stsel = new StringSelection(sbf.toString());
+		system = Toolkit.getDefaultToolkit().getSystemClipboard();
+		system.setContents(stsel, stsel);
+	}
     
     public void setTagLength(int nLength)
     {
