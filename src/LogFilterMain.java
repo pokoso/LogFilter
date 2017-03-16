@@ -276,6 +276,32 @@ public class LogFilterMain extends JFrame implements INotiEvent
         return logDir + File.separator + "LogFilter_" + format.format(now) + ".txt";
     }
     
+    private void deleteOldLogFiles() {
+		new Thread() {
+			public void run() {
+		    	File dir = new File(logDir);
+		    	if(!dir.exists())
+		    		return;
+		    	
+		    	int days = 7;	//delete file in N days before
+
+				long curTime = System.currentTimeMillis();
+				long time = 1 * 1000 * 60 * 60 * 24 * days;
+				if (dir.isDirectory()) {
+					String[] children = dir.list();
+					if (children == null)
+						return;
+
+					for (int i = 0; i < children.length; i++) {
+						File child = new File(dir, children[i]);
+						if (!child.isDirectory() && child.lastModified() + time < curTime)
+							child.delete();
+					}
+				}
+			}
+		}.start();
+    }
+    
     void exit()
     {
         if(m_Process != null) m_Process.destroy();
@@ -297,6 +323,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     public LogFilterMain()
     {
         super();
+        deleteOldLogFiles();
         addWindowListener(new WindowAdapter()
         {
             public void windowClosing(WindowEvent e)
@@ -1183,7 +1210,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     }
 
     void initValue()
-    {
+    { 	
         m_bPauseADB         = false;
         FILE_LOCK           = new Object();
         FILTER_LOCK         = new Object();
@@ -1735,7 +1762,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
                     m_Process = Runtime.getRuntime().exec(getProcessCmd());
                     BufferedReader stdOut   = new BufferedReader(new InputStreamReader(m_Process.getInputStream(), "UTF-8"));
 
-//                    BufferedWriter fileOut = new BufferedWriter(new FileWriter(m_strLogFileName));
                     Writer fileOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(m_strLogFileName), "UTF-8"));
 
                     startFileParse();
@@ -1748,13 +1774,11 @@ public class LogFilterMain extends JFrame implements INotiEvent
                             {
                                 fileOut.write(s);
                                 fileOut.write("\r\n");
-//                                fileOut.newLine();
                                 fileOut.flush();
                             }
                         }
                     }
                     fileOut.close();
-//                    T.d("Exit Code: " + m_Process.exitValue());
                 }
                 catch(Exception e)
                 {
