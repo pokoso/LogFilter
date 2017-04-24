@@ -340,11 +340,16 @@ public class LogTable extends JTable implements FocusListener, ActionListener
 				gotoNextBookmark();
 			return true;
 			
-		case KeyEvent.VK_F4:
-			if (e.getID() == KeyEvent.KEY_PRESSED)
-				m_LogFilterMain.onBtnClickClear();
-			return true;
-			
+//		case KeyEvent.VK_F4:
+//			if (e.getID() == KeyEvent.KEY_PRESSED)
+//				m_LogFilterMain.onBtnClickClear();
+//			return true;
+//
+//		case KeyEvent.VK_F5:
+//			if (e.getID() == KeyEvent.KEY_PRESSED)
+//				m_LogFilterMain.startProcess();
+//			return true;
+
 		case KeyEvent.VK_F:
 			if (e.getID() == KeyEvent.KEY_PRESSED
 					&& ((e.getModifiers() & InputEvent.CTRL_MASK) == InputEvent.CTRL_MASK)) {

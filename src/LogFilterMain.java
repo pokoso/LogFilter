@@ -20,6 +20,7 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -92,7 +93,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
 //    final String              ANDROID_RADIO_CMD          = "logcat -b radio -v time          ";
 //    final String              ANDROID_CUSTOM_CMD         = "logcat ";
 //    final String              ANDROID_SELECTED_CMD_LAST  = " logcat -v time ";
-    final String[]            DEVICES_CMD                = {" devices", "", ""};
+    final String[]            DEVICES_CMD                = {" devices -l", "", ""};
     
     static final int          DEFAULT_WIDTH              = 1200;
     static final int          DEFAULT_HEIGHT             = 720;
@@ -220,8 +221,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
 
         JMenuItem fileOpen = new JMenuItem("Open");
         fileOpen.setMnemonic(KeyEvent.VK_O);
-        fileOpen.setAccelerator( KeyStroke.getKeyStroke(KeyEvent.VK_O,
-                ActionEvent.ALT_MASK) );
+        fileOpen.setAccelerator( KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK) );
         fileOpen.setToolTipText("Open log file");
         fileOpen.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -242,9 +242,30 @@ public class LogFilterMain extends JFrame implements INotiEvent
             }
         });
 
+        JMenuItem menuClear = new JMenuItem("Clear");
+        menuClear.setMnemonic(KeyEvent.VK_F4);
+        menuClear.setAccelerator( KeyStroke.getKeyStroke("F4") );
+        menuClear.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            	mainFrame.onBtnClickClear();
+            }
+        });
+        
+        JMenuItem menuRun = new JMenuItem("Run");
+        menuRun.setMnemonic(KeyEvent.VK_F5);
+        menuRun.setAccelerator( KeyStroke.getKeyStroke("F5") );
+        menuRun.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            	mainFrame.startProcess();
+            }
+        });
+
         jMenufile.add(fileOpen);
         jMenufile.add(m_recentMenu);
         jMenufile.add(menuNewWindow);
+        jMenufile.addSeparator();
+        jMenufile.add(menuClear);
+        jMenufile.add(menuRun);
 
         menubar.add(jMenufile);
         mainFrame.setJMenuBar(menubar);
@@ -735,7 +756,9 @@ public class LogFilterMain extends JFrame implements INotiEvent
                 if(selectedItem != null)
                 {
                     m_strSelectedDevice = selectedItem.toString();
-                    m_strSelectedDevice = m_strSelectedDevice.replace("\t", " ").replace("device", "").replace("offline", "");
+                    int spacePos = m_strSelectedDevice.indexOf('(');
+                    if(spacePos > 0)
+                    	m_strSelectedDevice = m_strSelectedDevice.substring(0, spacePos);
                     setProcessCmd(m_comboDeviceCmd.getSelectedIndex(), m_strSelectedDevice);
                 }
             }
@@ -1139,10 +1162,10 @@ public class LogFilterMain extends JFrame implements INotiEvent
 //            }
 //        });
 
-        m_btnClear = new JButton("Clear");
+		m_btnClear = new JButton("Clear (F4)");
         m_btnClear.setMargin(new Insets(0, 0, 0, 0));
         m_btnClear.setEnabled(false);
-        m_btnRun = new JButton("Run");
+        m_btnRun = new JButton("Run (F5)");
         m_btnRun.setMargin(new Insets(0, 0, 0, 0));
 
         m_tbtnPause = new JToggleButton("Pause");
@@ -1330,10 +1353,19 @@ public class LogFilterMain extends JFrame implements INotiEvent
             // "표준 출력"과 "표준 에러 출력"을 출력
             while ((s =   stdOut.readLine()) != null)
             {
-                if(!s.equals("List of devices attached "))
+                if(!s.contains("List") && !s.isEmpty())
                 {
-                    s = s.replace("\t", " ");
-                    s = s.replace("device", "");
+                	String modelName = "";
+                	int modelPos = s.indexOf("model");
+                	if(modelPos > 0) {
+                		modelPos += 6;
+                    	int modelEndPos = s.indexOf(" ", modelPos);
+                    	modelName = s.substring(modelPos, modelEndPos);
+                	}
+                	
+                    s = s.substring(0, s.indexOf(' '));
+                    if(!modelName.isEmpty())
+                    	s += " (" + modelName + ")";
                     listModel.addElement(s);
                 }
             }
