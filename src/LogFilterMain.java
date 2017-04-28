@@ -165,6 +165,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     JCheckBox                 m_chkWarn;
     JCheckBox                 m_chkError;
     JCheckBox                 m_chkFatal;
+    JButton                   m_btnSelectAll;
     
     //Show column
     JCheckBox                 m_chkClmBookmark;
@@ -1006,6 +1007,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
         m_chkWarn       = new JCheckBox();
         m_chkError      = new JCheckBox();
         m_chkFatal      = new JCheckBox();
+        m_btnSelectAll  = new JButton();
+        m_btnSelectAll.addActionListener(m_alButtonListener);
 
         m_chkClmBookmark= new JCheckBox();
         m_chkClmLine    = new JCheckBox();
@@ -1034,12 +1037,15 @@ public class LogFilterMain extends JFrame implements INotiEvent
         m_chkError.setSelected(true);
         m_chkFatal.setText("Fatal");
         m_chkFatal.setSelected(true);
+        m_btnSelectAll.setText("Switch All");
+        
         jpLogFilter.add(m_chkVerbose);
         jpLogFilter.add(m_chkDebug);
         jpLogFilter.add(m_chkInfo);
         jpLogFilter.add(m_chkWarn);
         jpLogFilter.add(m_chkError);
         jpLogFilter.add(m_chkFatal);
+        jpLogFilter.add(m_btnSelectAll);
 
         jpMain.add(jpLogFilter, BorderLayout.NORTH);
 
@@ -1986,8 +1992,30 @@ public class LogFilterMain extends JFrame implements INotiEvent
             	m_strAdbPath = m_tfAdbPath.getText();
             	saveFilter();
             }
+            else if(e.getSource().equals(m_btnSelectAll)) {
+            	selectDeSelectFilters();
+            }
         }
     };
+    
+    private void selectDeSelectFilters() {
+		if (m_chkVerbose.isSelected() && m_chkDebug.isSelected() && m_chkInfo.isSelected() && m_chkWarn.isSelected()
+				&& m_chkError.isSelected() && m_chkFatal.isSelected()) {      
+			m_chkVerbose.setSelected(false);
+			m_chkDebug.setSelected(false);
+			m_chkInfo.setSelected(false);
+			m_chkWarn.setSelected(false);
+			m_chkError.setSelected(false);
+			m_chkFatal.setSelected(false);
+        } else {
+			m_chkVerbose.setSelected(true);
+			m_chkDebug.setSelected(true);
+			m_chkInfo.setSelected(true);
+			m_chkWarn.setSelected(true);
+			m_chkError.setSelected(true);
+			m_chkFatal.setSelected(true);
+        }
+    }
     
     public void onBtnClickClear() {
         boolean bBackup = m_bPauseADB;
