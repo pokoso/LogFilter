@@ -207,10 +207,10 @@ public class LogCatParser implements ILogParser
 
     public LogInfo parseLog(String strText)
     {
-        if(isNormal(strText))
-            return getNormal(strText);
-        else if(isThreadTime(strText))
+        if(isThreadTime(strText))
             return getThreadTime(strText);
+        else if(isNormal(strText))
+            return getNormal(strText);
         else if(isKernel(strText))
             return getKernel(strText);
         else
