@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -1228,6 +1229,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
         m_tmLogTableModel = new LogFilterTableModel();
         m_tmLogTableModel.setData(m_arLogInfoAll);
         m_tbLogTable = new LogTable(m_tmLogTableModel, this);
+        m_tbLogTable.setSelectionBackground(Color.ORANGE);
         m_iLogParser = new LogCatParser();
         m_tbLogTable.setLogParser(m_iLogParser);
 
