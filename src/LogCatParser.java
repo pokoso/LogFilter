@@ -75,6 +75,17 @@ public class LogCatParser implements ILogParser
                 || strLevel.equals("F/")
                 )
             return true;
+        
+        strLevel = (String)strText.substring(20, 22);
+        if(strLevel.equals("D/")
+                || strLevel.equals("V/")
+                || strLevel.equals("I/")
+                || strLevel.equals("W/")
+                || strLevel.equals("E/")
+                || strLevel.equals("F/")
+                )
+            return true;
+        
         return false;
     }
 
