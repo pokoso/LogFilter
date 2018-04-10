@@ -2,8 +2,8 @@ public class LogColor
 {
                                         //aarrggbb
     public static int   COLOR_GUIDE     = 0x00000000;
-    public static int   COLOR_BOOKMARK  = 0x00DDDDDD;
-    public static int   COLOR_BOOKMARK2 = 0x00DDDDFF;
+    public static int   COLOR_BOOKMARK  = 0x00FFFF00;
+    public static int   COLOR_BOOKMARK2 = 0x00FFFF55;
     public static int   COLOR_DEBUG     = 0x000000AA;
     public static int   COLOR_ERROR     = 0x00FF0000;
     public static int   COLOR_FATAL     = 0x00FF0000;

@@ -1229,7 +1229,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
         m_tmLogTableModel = new LogFilterTableModel();
         m_tmLogTableModel.setData(m_arLogInfoAll);
         m_tbLogTable = new LogTable(m_tmLogTableModel, this);
-        m_tbLogTable.setSelectionBackground(Color.ORANGE);
+        m_tbLogTable.setSelectionBackground(Color.LIGHT_GRAY);
         m_iLogParser = new LogCatParser();
         m_tbLogTable.setLogParser(m_iLogParser);
 
