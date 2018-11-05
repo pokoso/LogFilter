@@ -106,6 +106,23 @@ public class LogCatParser implements ILogParser
         return false;
     }
     
+    //10-29 20:22:32.348  wifi  3343  3343 I android.hardware.wifi@1.0-service: getLinkLayerStats
+    public boolean isThreadTimePlus(String strText)
+    {
+        if(strText.length() < 34) return false;
+
+        String strLevel = (String)strText.substring(37, 39);
+        if(strLevel.equals("D ")
+                || strLevel.equals("V ")
+                || strLevel.equals("I ")
+                || strLevel.equals("W ")
+                || strLevel.equals("E ")
+                || strLevel.equals("F ")
+                )
+            return true;
+        return false;
+    }
+    
 //    <4>[19553.494855] [DEBUG] USB_SEL(1) HIGH set USB mode 
     public boolean isKernel(String strText)
     {
@@ -183,6 +200,38 @@ public class LogCatParser implements ILogParser
         return logInfo;
     }
 
+    public LogInfo getThreadTimePlus(String strText)
+    {
+        LogInfo logInfo = new LogInfo();
+        
+        StringTokenizer stk = new StringTokenizer(strText, TOKEN_SPACE, false);
+        if(stk.hasMoreElements())
+            logInfo.m_strDate = stk.nextToken();
+        if(stk.hasMoreElements())
+            logInfo.m_strTime = stk.nextToken();
+        if(stk.hasMoreElements()) {
+        	stk.nextToken();
+        	logInfo.m_strPid = stk.nextToken().trim();
+        }            
+        if(stk.hasMoreElements())
+            logInfo.m_strThread = stk.nextToken().trim();
+        if(stk.hasMoreElements())
+            logInfo.m_strLogLV = stk.nextToken().trim();
+        if(stk.hasMoreElements())
+            logInfo.m_strTag = stk.nextToken();
+        if(stk.hasMoreElements())
+        {
+            logInfo.m_strMessage = stk.nextToken(TOKEN_MESSAGE);
+            while(stk.hasMoreElements())
+            {
+                logInfo.m_strMessage += stk.nextToken(TOKEN_MESSAGE);
+            }
+            logInfo.m_strMessage = logInfo.m_strMessage.replaceFirst("\\): ", "");
+        }
+        logInfo.m_TextColor = getColor(logInfo);
+        return logInfo;
+    }
+    
     public LogInfo getKernel(String strText)
     {
         LogInfo logInfo = new LogInfo();
@@ -208,9 +257,11 @@ public class LogCatParser implements ILogParser
     public LogInfo parseLog(String strText)
     {
         if(isThreadTime(strText))
-            return getThreadTime(strText);
+            return getThreadTime(strText);        
         else if(isNormal(strText))
             return getNormal(strText);
+        if(isThreadTimePlus(strText))
+            return getThreadTimePlus(strText);
         else if(isKernel(strText))
             return getKernel(strText);
         else
