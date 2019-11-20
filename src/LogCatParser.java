@@ -109,7 +109,7 @@ public class LogCatParser implements ILogParser
     //10-29 20:22:32.348  wifi  3343  3343 I android.hardware.wifi@1.0-service: getLinkLayerStats
     public boolean isThreadTimePlus(String strText)
     {
-        if(strText.length() < 34) return false;
+        if(strText.length() < 40) return false;
 
         String strLevel = (String)strText.substring(37, 39);
         if(strLevel.equals("D ")
@@ -211,7 +211,8 @@ public class LogCatParser implements ILogParser
             logInfo.m_strTime = stk.nextToken();
         if(stk.hasMoreElements()) {
         	stk.nextToken();
-        	logInfo.m_strPid = stk.nextToken().trim();
+        	if(stk.hasMoreElements())
+        		logInfo.m_strPid = stk.nextToken().trim();
         }            
         if(stk.hasMoreElements())
             logInfo.m_strThread = stk.nextToken().trim();
