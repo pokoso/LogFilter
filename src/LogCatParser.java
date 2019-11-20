@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
 public class LogCatParser implements ILogParser
 {
     final String TOKEN_KERNEL= "<>[]";
+    final String TOKEN_IOS= " []";
     final String TOKEN_SPACE = " ";
     final String TOKEN_SLASH = "/";
     final String TOKEN       = "/()";
@@ -119,6 +120,16 @@ public class LogCatParser implements ILogParser
                 || strLevel.equals("E ")
                 || strLevel.equals("F ")
                 )
+            return true;
+        return false;
+    }
+    
+    public boolean isIOS(String strText)
+    {
+        if(strText.length() < 26) return false;
+
+        String strLevel = (String)strText.substring(24, 25);
+        if(strLevel.equals("["))
             return true;
         return false;
     }
@@ -233,6 +244,34 @@ public class LogCatParser implements ILogParser
         return logInfo;
     }
     
+    public LogInfo getIOS(String strText)
+    {
+        LogInfo logInfo = new LogInfo();
+        
+        StringTokenizer stk = new StringTokenizer(strText, TOKEN_IOS, false);
+        if(stk.hasMoreElements())
+        	logInfo.m_strDate = stk.nextToken();            
+        if(stk.hasMoreElements())
+            logInfo.m_strTime = stk.nextToken();
+        if(stk.hasMoreElements())
+        	logInfo.m_strTag = stk.nextToken();
+        if(stk.hasMoreElements())
+        	logInfo.m_strLogLV = stk.nextToken().toUpperCase();
+        
+        if(stk.hasMoreElements())
+        {
+            logInfo.m_strMessage = stk.nextToken(TOKEN_MESSAGE);
+            while(stk.hasMoreElements())
+            {
+                logInfo.m_strMessage += stk.nextToken(TOKEN_MESSAGE);
+            }
+            logInfo.m_strMessage = logInfo.m_strMessage.replaceFirst("\\): ", "");
+        }
+        logInfo.m_TextColor = getColor(logInfo);
+
+        return logInfo;
+    }
+    
     public LogInfo getKernel(String strText)
     {
         LogInfo logInfo = new LogInfo();
@@ -261,8 +300,10 @@ public class LogCatParser implements ILogParser
             return getThreadTime(strText);        
         else if(isNormal(strText))
             return getNormal(strText);
-        if(isThreadTimePlus(strText))
-            return getThreadTimePlus(strText);
+        else if(isThreadTimePlus(strText))
+            return getThreadTimePlus(strText);        
+        else if(isIOS(strText))
+            return getIOS(strText);
         else if(isKernel(strText))
             return getKernel(strText);
         else
