@@ -12,6 +12,7 @@ public class LogCatParser implements ILogParser
 {
     final String TOKEN_KERNEL= "<>[]";
     final String TOKEN_IOS= " []";
+    final String TOKEN_PC= " []";
     final String TOKEN_SPACE = " ";
     final String TOKEN_SLASH = "/";
     final String TOKEN       = "/()";
@@ -293,6 +294,49 @@ public class LogCatParser implements ILogParser
         logInfo.m_TextColor = getColor(logInfo);
         return logInfo;
     }
+    
+    public boolean isPc(String strText)
+    {
+        if(strText.length() < 38) return false;
+
+        String strCheck = (String)strText.substring(0, 1);
+        if(!strCheck.equals("["))
+            return false;
+        
+        strCheck = (String)strText.substring(2, 3);
+        if(!strCheck.equals("]"))
+            return false;
+        
+        return true;
+    }
+    
+    public LogInfo getPc(String strText)
+    {
+        LogInfo logInfo = new LogInfo();
+        
+        StringTokenizer stk = new StringTokenizer(strText, TOKEN_PC, false);
+        if(stk.hasMoreElements())
+            logInfo.m_strLogLV = stk.nextToken();
+        if(stk.hasMoreElements())
+            logInfo.m_strDate = stk.nextToken();
+        if(stk.hasMoreElements())
+            logInfo.m_strTime = stk.nextToken();
+        if(stk.hasMoreElements())
+            logInfo.m_strPid = stk.nextToken();        
+        if(stk.hasMoreElements())
+            logInfo.m_strThread = stk.nextToken();        
+        if(stk.hasMoreElements())
+        {
+            logInfo.m_strMessage = stk.nextToken(TOKEN_PC);
+            while(stk.hasMoreElements())
+            {
+                logInfo.m_strMessage += " " + stk.nextToken(TOKEN_PC);
+            }
+            logInfo.m_strMessage = logInfo.m_strMessage.replaceFirst("  ", "");
+        }
+		logInfo.m_TextColor = getColor(logInfo);
+        return logInfo;
+    }    
 
     public LogInfo parseLog(String strText)
     {
@@ -306,6 +350,8 @@ public class LogCatParser implements ILogParser
             return getIOS(strText);
         else if(isKernel(strText))
             return getKernel(strText);
+        else if(isPc(strText))
+            return getPc(strText);        
         else
         {
             LogInfo logInfo = new LogInfo();
