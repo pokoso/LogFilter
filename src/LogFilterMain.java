@@ -81,7 +81,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     private static int _processCount = 0;
     
     static final String       LOGFILTER                  = "LogFilter";
-    static final String       VERSION                    = "Version 2.2";
+    static final String       VERSION                    = "Version 2.3";
     final String              COMBO_ANDROID              = "Android          ";
     final String              COMBO_IOS                  = "ios";
     final String              COMBO_CUSTOM_COMMAND       = "custom command";
@@ -182,7 +182,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
     JTextField                m_tfFontSize;
 //    JTextField                  m_tfProcessCmd;
     JComboBox                 m_comboEncode;
-    JComboBox                 m_jcFontType;
+    //JComboBox                 m_jcFontType;
+    JButton                   m_btnNewWindow;
     JButton                   m_btnRun;
     JButton                   m_btnClear;
     JToggleButton             m_tbtnPause;
@@ -517,9 +518,9 @@ public class LogFilterMain extends JFrame implements INotiEvent
             p.load(new FileInputStream(INI_FILE));
             
             // Key °ª ÀÐ±â
-            String strFontType = p.getProperty(INI_FONT_TYPE);
-            if(strFontType != null && strFontType.length() > 0)
-                m_jcFontType.setSelectedItem(p.getProperty(INI_FONT_TYPE));
+//            String strFontType = p.getProperty(INI_FONT_TYPE);
+//            if(strFontType != null && strFontType.length() > 0)
+//                m_jcFontType.setSelectedItem(p.getProperty(INI_FONT_TYPE));
             m_strAdbPath = p.getProperty(INI_ADB_PATH);
             if(m_strAdbPath.isEmpty())
             	m_tfAdbPath.setText("/Users/username/Library/Android/sdk/platform-tools/adb");
@@ -560,7 +561,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
 //            p.setProperty( INI_LAST_DIR, m_strLastDir );
             
             p.setProperty(INI_ADB_PATH,    m_strAdbPath);
-            p.setProperty(INI_FONT_TYPE,   (String)m_jcFontType.getSelectedItem());
+            //p.setProperty(INI_FONT_TYPE,   (String)m_jcFontType.getSelectedItem());
             p.setProperty(INI_WORD_FIND,   m_tfFindWord.getText());
             p.setProperty(INI_WORD_REMOVE, m_tfRemoveWord.getText());
             p.setProperty(INI_TAG_SHOW,    m_tfShowTag.getText());
@@ -1102,15 +1103,15 @@ public class LogFilterMain extends JFrame implements INotiEvent
         JPanel optionMenu = new JPanel(new BorderLayout());
         JPanel optionWest = new JPanel();
 
-        JLabel jlFontType = new JLabel("Font Type : ");
-        m_jcFontType = new JComboBox();
-        String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-        m_jcFontType.addItem("Dialog");
-        for ( int i = 0; i < fonts.length; i++ )
-        {
-            m_jcFontType.addItem(fonts[i]);
-        }
-        m_jcFontType.addActionListener(m_alButtonListener);
+        //JLabel jlFontType = new JLabel("Font Type : ");
+        //m_jcFontType = new JComboBox();
+        //String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+//        m_jcFontType.addItem("Dialog");
+//        for ( int i = 0; i < fonts.length; i++ )
+//        {
+//            m_jcFontType.addItem(fonts[i]);
+//        }
+//        m_jcFontType.addActionListener(m_alButtonListener);
 
 
         JLabel jlFont = new JLabel("Font Size : ");
@@ -1168,6 +1169,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
 ////                setProcessCmd(m_comboDeviceCmd.getSelectedIndex(), m_strSelectedDevice);
 //            }
 //        });
+        
+        m_btnNewWindow = new JButton("New Window");
 
 		m_btnClear = new JButton("Clear (F4)");
         m_btnClear.setMargin(new Insets(0, 0, 0, 0));
@@ -1181,13 +1184,16 @@ public class LogFilterMain extends JFrame implements INotiEvent
         m_btnStop = new JButton("Stop");
         m_btnStop.setMargin(new Insets(0, 0, 0, 0));
         m_btnStop.setEnabled(false);
+        
+        m_btnNewWindow.addActionListener(m_alButtonListener);
         m_btnRun.addActionListener(m_alButtonListener);
         m_btnStop.addActionListener(m_alButtonListener);
         m_btnClear.addActionListener(m_alButtonListener);
         m_tbtnPause.addActionListener(m_alButtonListener);
 
-        optionWest.add(jlFontType);
-        optionWest.add(m_jcFontType);
+//        optionWest.add(jlFontType);
+//        optionWest.add(m_jcFontType);
+        optionWest.add(m_btnNewWindow);
         optionWest.add(jlFont);
         optionWest.add(m_tfFontSize);
         optionWest.add(m_btnSetFont);
@@ -1964,8 +1970,12 @@ public class LogFilterMain extends JFrame implements INotiEvent
     {
         public void actionPerformed(ActionEvent e)
         {
-            if(e.getSource().equals(m_btnDevice))
-                setDeviceList();
+            if(e.getSource().equals(m_btnDevice)) {
+            	setDeviceList();
+            }
+            else if(e.getSource().equals(m_btnNewWindow)) {
+            	main(null);
+            }
             else if(e.getSource().equals(m_btnSetFont)) {
                 m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
                 updateTable(-1, false);
@@ -1984,13 +1994,13 @@ public class LogFilterMain extends JFrame implements INotiEvent
             }
             else if(e.getSource().equals(m_tbtnPause))
                 pauseProcess();
-            else if(e.getSource().equals(m_jcFontType))
-            {
-                T.d("font = " + m_tbLogTable.getFont());
-                
-                m_tbLogTable.setFont(new Font((String)m_jcFontType.getSelectedItem(), Font.PLAIN, 12));
-                m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
-            }
+//            else if(e.getSource().equals(m_jcFontType))
+//            {
+//                T.d("font = " + m_tbLogTable.getFont());
+//                
+//                m_tbLogTable.setFont(new Font((String)m_jcFontType.getSelectedItem(), Font.PLAIN, 12));
+//                m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
+//            }
             else if(e.getSource().equals(m_btnAdbPath)) {
             	m_strAdbPath = m_tfAdbPath.getText();
             	saveFilter();
