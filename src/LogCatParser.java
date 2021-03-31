@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
  */
 public class LogCatParser implements ILogParser {
 	final String TOKEN_KERNEL = "<>[]";
+	final String TOKEN_AOS = " -/";
 	final String TOKEN_IOS = " []";
 	final String TOKEN_PC = " []";
 	final String TOKEN_SPACE = " ";
@@ -102,6 +103,20 @@ public class LogCatParser implements ILogParser {
 		if (strLevel.equals("D ") || strLevel.equals("V ") || strLevel.equals("I ") || strLevel.equals("W ")
 				|| strLevel.equals("E ") || strLevel.equals("F "))
 			return true;
+		return false;
+	}
+	
+	//2021-03-31 12:15:32.846 1088-1308/? V/CameraDeviceClient: onResultAvailable
+	public boolean isAos(String strText) {
+		if (strText.length() < 25)
+			return false;
+
+		String check1 = (String) strText.substring(10, 11);
+		String check2 = (String) strText.substring(23, 24);
+		
+		if (check1.equals(" ") && check2.equals(" "))
+			return true;
+		
 		return false;
 	}
 
@@ -256,6 +271,40 @@ public class LogCatParser implements ILogParser {
 		return logInfo;
 	}
 
+	//2021-03-31 12:15:32.210 1134-1435/? I/TwinMgr: [configPath] [configPath][0]cfgInParam.datPat:0
+	public LogInfo getAos(String strText) {
+		LogInfo logInfo = new LogInfo();
+
+		StringTokenizer stk = new StringTokenizer(strText, TOKEN_AOS, false);
+		if (stk.hasMoreElements())
+			logInfo.m_strDate += stk.nextToken();
+		if (stk.hasMoreElements())
+			logInfo.m_strDate += "-" + stk.nextToken();
+		if (stk.hasMoreElements())
+			logInfo.m_strDate += "-" + stk.nextToken();
+		if (stk.hasMoreElements())
+			logInfo.m_strTime = stk.nextToken();
+		if (stk.hasMoreElements())
+			logInfo.m_strPid = stk.nextToken().trim();		
+		if (stk.hasMoreElements())
+			logInfo.m_strThread = stk.nextToken().trim();
+		if (stk.hasMoreElements())
+			logInfo.m_strLogLV = stk.nextToken().trim();  //Ignore process name
+		if (stk.hasMoreElements())
+			logInfo.m_strLogLV = stk.nextToken().trim();
+		if (stk.hasMoreElements())
+			logInfo.m_strTag = stk.nextToken();	
+		if (stk.hasMoreElements()) {
+			logInfo.m_strMessage = stk.nextToken(TOKEN_MESSAGE);
+			while (stk.hasMoreElements()) {
+				logInfo.m_strMessage += stk.nextToken(TOKEN_MESSAGE);
+			}
+			logInfo.m_strMessage = logInfo.m_strMessage.replaceFirst("\\): ", "");
+		}
+		logInfo.m_TextColor = getColor(logInfo);
+		return logInfo;
+	}
+	
 	public LogInfo getIOS(String strText) {
 		LogInfo logInfo = new LogInfo();
 
@@ -349,6 +398,8 @@ public class LogCatParser implements ILogParser {
 			return getThreadTimePlus(strText);
 		else if (isThreadTime2(strText))
 			return getThreadTime2(strText);
+		else if (isAos(strText))
+			return getAos(strText);
 		else if (isIOS(strText))
 			return getIOS(strText);
 		else if (isKernel(strText))
