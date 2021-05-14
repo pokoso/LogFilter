@@ -295,9 +295,9 @@ public class LogCatParser implements ILogParser {
 		if (stk.hasMoreElements())
 			logInfo.m_strTag = stk.nextToken();	
 		if (stk.hasMoreElements()) {
-			logInfo.m_strMessage = stk.nextToken(TOKEN_MESSAGE);
+			logInfo.m_strMessage = stk.nextToken("");
 			while (stk.hasMoreElements()) {
-				logInfo.m_strMessage += stk.nextToken(TOKEN_MESSAGE);
+				logInfo.m_strMessage += stk.nextToken("");
 			}
 			logInfo.m_strMessage = logInfo.m_strMessage.replaceFirst("\\): ", "");
 		}
@@ -319,9 +319,9 @@ public class LogCatParser implements ILogParser {
 			logInfo.m_strLogLV = stk.nextToken().toUpperCase();
 
 		if (stk.hasMoreElements()) {
-			logInfo.m_strMessage = stk.nextToken(TOKEN_MESSAGE);
+			logInfo.m_strMessage = stk.nextToken("");
 			while (stk.hasMoreElements()) {
-				logInfo.m_strMessage += stk.nextToken(TOKEN_MESSAGE);
+				logInfo.m_strMessage += stk.nextToken("");
 			}
 			logInfo.m_strMessage = logInfo.m_strMessage.replaceFirst("\\): ", "");
 		}
@@ -376,14 +376,15 @@ public class LogCatParser implements ILogParser {
 			logInfo.m_strTime = stk.nextToken();
 		if (stk.hasMoreElements())
 			logInfo.m_strPid = stk.nextToken();
-		if (stk.hasMoreElements())
-			logInfo.m_strThread = stk.nextToken();
 		if (stk.hasMoreElements()) {
-			logInfo.m_strMessage = stk.nextToken(TOKEN_PC);
+			logInfo.m_strThread = stk.nextToken();
+			logInfo.m_strThread += stk.nextToken();
+		}			
+		if (stk.hasMoreElements()) {
+			logInfo.m_strMessage = stk.nextToken("");
 			while (stk.hasMoreElements()) {
-				logInfo.m_strMessage += " " + stk.nextToken(TOKEN_PC);
+				logInfo.m_strMessage += " " + stk.nextToken("");
 			}
-			logInfo.m_strMessage = logInfo.m_strMessage.replaceFirst("  ", "");
 		}
 		logInfo.m_TextColor = getColor(logInfo);
 		return logInfo;

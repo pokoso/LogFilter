@@ -81,7 +81,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     private static int _processCount = 0;
     
     static final String       LOGFILTER                  = "LogFilter";
-    static final String       VERSION                    = "Version 2.4";
+    static final String       VERSION                    = "Version 2.5";
     final String              COMBO_ANDROID              = "Android          ";
     final String              COMBO_IOS                  = "ios";
     final String              COMBO_CUSTOM_COMMAND       = "custom command";
