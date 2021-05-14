@@ -81,7 +81,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     private static int _processCount = 0;
     
     static final String       LOGFILTER                  = "LogFilter";
-    static final String       VERSION                    = "Version 2.5";
+    static final String       VERSION                    = "Version 2.6";
     final String              COMBO_ANDROID              = "Android          ";
     final String              COMBO_IOS                  = "ios";
     final String              COMBO_CUSTOM_COMMAND       = "custom command";
@@ -1126,6 +1126,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
         JLabel jlEncode = new JLabel("Text Encode : ");
         m_comboEncode = new JComboBox();
         m_comboEncode.addItem("UTF-8");
+        m_comboEncode.addItem("UTF-16");
+        m_comboEncode.addItem("UTF-16LE");
         m_comboEncode.addItem("Local");
 
         JLabel jlGoto = new JLabel("Goto : ");
@@ -1289,6 +1291,10 @@ public class LogFilterMain extends JFrame implements INotiEvent
                     in = new DataInputStream(fstream);
                     if(m_comboEncode.getSelectedItem().equals("UTF-8"))
                         br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                    else if(m_comboEncode.getSelectedItem().equals("UTF-16"))
+                        br = new BufferedReader(new InputStreamReader(in, "UTF-16"));
+                    else if(m_comboEncode.getSelectedItem().equals("UTF-16LE"))
+                        br = new BufferedReader(new InputStreamReader(in, "UTF-16LE"));                    
                     else
                         br = new BufferedReader(new InputStreamReader(in));
 
@@ -1577,6 +1583,10 @@ public class LogFilterMain extends JFrame implements INotiEvent
                     in = new DataInputStream(fstream);
                     if(m_comboEncode.getSelectedItem().equals("UTF-8"))
                         br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                    else if(m_comboEncode.getSelectedItem().equals("UTF-16"))
+                        br = new BufferedReader(new InputStreamReader(in, "UTF-16"));
+                    else if(m_comboEncode.getSelectedItem().equals("UTF-16LE"))
+                        br = new BufferedReader(new InputStreamReader(in, "UTF-16LE"));                    
                     else
                         br = new BufferedReader(new InputStreamReader(in));
 

@@ -401,6 +401,8 @@ public class LogCatParser implements ILogParser {
 			return getThreadTime2(strText);
 		else if (isAos(strText))
 			return getAos(strText);
+		else if (isThreadTime(strText))
+			return getThreadTime(strText);		
 		else if (isIOS(strText))
 			return getIOS(strText);
 		else if (isKernel(strText))
