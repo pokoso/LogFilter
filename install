@@ -1,0 +1,9 @@
+#!/bin/bash
+# 
+
+echo "## Install Log Filter ##"
+
+rm -f bin
+mkdir bin
+javac -d bin src/*.java
+jar -cvfe LogFilter.jar LogFilterMain -C bin .

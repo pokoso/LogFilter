@@ -422,7 +422,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
         {
             Properties p = new Properties();
             
-            // ini 파일 읽기
             p.load(new FileInputStream(INI_FILE_CMD));
             
             T.d("p.getProperty(INI_CMD_COUNT) = " + p.getProperty(INI_CMD_COUNT));
@@ -514,10 +513,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
         {
             Properties p = new Properties();
             
-            // ini 파일 읽기
             p.load(new FileInputStream(INI_FILE));
             
-            // Key 값 읽기
 //            String strFontType = p.getProperty(INI_FONT_TYPE);
 //            if(strFontType != null && strFontType.length() > 0)
 //                m_jcFontType.setSelectedItem(p.getProperty(INI_FONT_TYPE));
@@ -597,26 +594,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
     {
         addDesc(VERSION);
         addDesc("");
-        addDesc("Version 1.8 : java -jar LogFilter_xx.jar [filename] 추가");
-        addDesc("Version 1.7 : copy시 보이는 column만 clipboard에 복사(Line 제외)");
-        addDesc("Version 1.6 : cmd콤보박스 길이 고정");
-        addDesc("Version 1.5 : Highlight color list추가()");
-        addDesc("   - LogFilterColor.ini 에 카운트와 값 넣어 주시면 됩니다.");
-        addDesc("   - ex)INI_HIGILIGHT_COUNT=2");
-        addDesc("   -    INI_COLOR_HIGILIGHT_0=0xFFFF");
-        addDesc("   -    INI_COLOR_HIGILIGHT_1=0x00FF");
-        addDesc("Version 1.4 : 창크기 저장");
-        addDesc("Version 1.3 : recent file 및 open메뉴추가");
-        addDesc("Version 1.2 : Tid 필터 추가");
-        addDesc("Version 1.1 : Level F 추가");
-        addDesc("Version 1.0 : Pid filter 추가");
-        addDesc("Version 0.9 : Font type 추가");
-        addDesc("Version 0.8 : 필터체크 박스 추가");
-        addDesc("Version 0.7 : 커널로그 파싱/LogFilter.ini에 컬러정의(0~7)");
-        addDesc("Version 0.6 : 필터 대소문 무시");
-        addDesc("Version 0.5 : 명령어 ini파일로 저장");
-        addDesc("Version 0.4 : add thread option, filter 저장");
-        addDesc("Version 0.3 : 단말 선택 안되는 문제 수정");
+        addDesc("Enter the 'adb full path' in the upper left path: field");
+        addDesc("And press Set button");
         addDesc("");
         addDesc("[Tag]");
         addDesc("Alt+L/R Click : Show/Remove tag");
@@ -635,7 +614,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
     }
 
     /**
-     * @param nIndex    실제 리스트의 인덱스
+     * @param nIndex    Last Index
      * @param nLine     m_strLine
      * @param bBookmark
      */
@@ -1367,11 +1346,9 @@ public class LogFilterMain extends JFrame implements INotiEvent
                 strCommand = (String)m_comboDeviceCmd.getSelectedItem();
             Process oProcess = Runtime.getRuntime().exec(strCommand);
 
-            // 외부 프로그램 출력 읽기
             BufferedReader stdOut   = new BufferedReader(new InputStreamReader(oProcess.getInputStream()));
             BufferedReader stdError = new BufferedReader(new InputStreamReader(oProcess.getErrorStream()));
 
-            // "표준 출력"과 "표준 에러 출력"을 출력
             while ((s =   stdOut.readLine()) != null)
             {
                 if(!s.contains("List") && !s.isEmpty())
@@ -1395,7 +1372,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
                 listModel.addElement(s);
             }
 
-            // 외부 프로그램 반환값 출력 (이 부분은 필수가 아님)
             System.out.println("Exit Code: " + oProcess.exitValue());
         }
         catch(Exception e)
