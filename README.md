@@ -1,5 +1,7 @@
 # LogFilter
-Log filter for android (MAC OS) 
+Log filter for Android
+
+- Available for Mac OS
 
 - Install 
 
@@ -14,3 +16,7 @@ Log filter for android (MAC OS)
 3. Press OK button (If your Android device is connected, you can see it in the list)
 4. Select Device
 5. Press Run (F5) 
+
+
+- You can apply multiple filter values by '|'
+eg.) Runtime|DEBUG|System
