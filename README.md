@@ -3,13 +3,13 @@ Log filter for Android
 
 - Available for Mac OS
 
-- Install 
+Install 
 
 1. #> ./install
 2. #> ./run (or Drag the LogFilter.jar file next to the trash icon)
 
 
-- How to use
+How to use
 
 1. Enter the 'adb full path' in the upper left path: field
 2. press Set button
@@ -18,5 +18,5 @@ Log filter for Android
 5. Press Run (F5) 
 
 
-- You can apply multiple filter values by '|'
+You can apply multiple filter values by '|'
 eg.) Runtime|DEBUG|System
