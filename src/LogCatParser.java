@@ -63,7 +63,7 @@ public class LogCatParser implements ILogParser {
 			return LogInfo.LOG_LV_VERBOSE;
 	}
 
-//04-17 09:01:18.910 D/LightsService(  139): BKL : 106
+	// 04-17 09:01:18.910 D/LightsService( 139): BKL : 106
 	public boolean isNormal(String strText) {
 		if (strText.length() < 22)
 			return false;
@@ -81,7 +81,7 @@ public class LogCatParser implements ILogParser {
 		return false;
 	}
 
-//04-20 12:06:02.125   146   179 D BatteryService: update start    
+	// 04-20 12:06:02.125 146 179 D BatteryService: update start
 	public boolean isThreadTime(String strText) {
 		if (strText.length() < 34)
 			return false;
@@ -105,18 +105,18 @@ public class LogCatParser implements ILogParser {
 			return true;
 		return false;
 	}
-	
-	//2021-03-31 12:15:32.846 1088-1308/? V/CameraDeviceClient: onResultAvailable
+
+	// 2021-03-31 12:15:32.846 1088-1308/? V/CameraDeviceClient: onResultAvailable
 	public boolean isAos(String strText) {
 		if (strText.length() < 25)
 			return false;
 
 		String check1 = (String) strText.substring(10, 11);
 		String check2 = (String) strText.substring(23, 24);
-		
+
 		if (check1.equals(" ") && check2.equals(" "))
 			return true;
-		
+
 		return false;
 	}
 
@@ -144,7 +144,54 @@ public class LogCatParser implements ILogParser {
 		return false;
 	}
 
-//    <4>[19553.494855] [DEBUG] USB_SEL(1) HIGH set USB mode 
+	public boolean isChatPlus(String strText) {
+		if (strText.length() < 43)
+			return false;
+
+		String strCheck = (String) strText.substring(0, 1);
+		if (!strCheck.equals("["))
+			return false;
+
+		strCheck = (String) strText.substring(3, 4);
+		if (!strCheck.equals("/"))
+			return false;
+
+		strCheck = (String) strText.substring(6, 7);
+		if (!strCheck.equals("/"))
+			return false;
+
+		return true;
+	}
+
+	public LogInfo getChatPlus(String strText) {
+		LogInfo logInfo = new LogInfo();
+
+		StringTokenizer stk = new StringTokenizer(strText, TOKEN_PC, false);
+
+		if (stk.hasMoreElements())
+			logInfo.m_strDate = stk.nextToken();
+		if (stk.hasMoreElements())
+			logInfo.m_strTime = stk.nextToken();
+		if (stk.hasMoreElements())
+			logInfo.m_strThread = stk.nextToken();
+		if (stk.hasMoreElements())
+			logInfo.m_strLogLV = stk.nextToken();
+		if (stk.hasMoreElements())
+			logInfo.m_strPid = stk.nextToken();
+		// if (stk.hasMoreElements())
+		// logInfo.m_strTag = stk.nextToken();
+		if (stk.hasMoreElements()) {
+			logInfo.m_strMessage = stk.nextToken("");
+			logInfo.m_strMessage = logInfo.m_strMessage.substring(1);
+			while (stk.hasMoreElements()) {
+				logInfo.m_strMessage += " " + stk.nextToken("");
+			}
+		}
+		logInfo.m_TextColor = getColor(logInfo);
+		return logInfo;
+	}
+
+	// <4>[19553.494855] [DEBUG] USB_SEL(1) HIGH set USB mode
 	public boolean isKernel(String strText) {
 		if (strText.length() < 18)
 			return false;
@@ -154,6 +201,25 @@ public class LogCatParser implements ILogParser {
 				|| strLevel.equals("4") || strLevel.equals("5") || strLevel.equals("6") || strLevel.equals("7"))
 			return true;
 		return false;
+	}
+
+	public LogInfo getKernel(String strText) {
+		LogInfo logInfo = new LogInfo();
+
+		StringTokenizer stk = new StringTokenizer(strText, TOKEN_KERNEL, false);
+		if (stk.hasMoreElements())
+			logInfo.m_strLogLV = stk.nextToken();
+		if (stk.hasMoreElements())
+			logInfo.m_strTime = stk.nextToken();
+		if (stk.hasMoreElements()) {
+			logInfo.m_strMessage = stk.nextToken(TOKEN_KERNEL);
+			while (stk.hasMoreElements()) {
+				logInfo.m_strMessage += " " + stk.nextToken(TOKEN_SPACE);
+			}
+			logInfo.m_strMessage = logInfo.m_strMessage.replaceFirst("  ", "");
+		}
+		logInfo.m_TextColor = getColor(logInfo);
+		return logInfo;
 	}
 
 	public LogInfo getNormal(String strText) {
@@ -271,7 +337,8 @@ public class LogCatParser implements ILogParser {
 		return logInfo;
 	}
 
-	//2021-03-31 12:15:32.210 1134-1435/? I/TwinMgr: [configPath] [configPath][0]cfgInParam.datPat:0
+	// 2021-03-31 12:15:32.210 1134-1435/? I/TwinMgr: [configPath]
+	// [configPath][0]cfgInParam.datPat:0
 	public LogInfo getAos(String strText) {
 		LogInfo logInfo = new LogInfo();
 
@@ -285,15 +352,15 @@ public class LogCatParser implements ILogParser {
 		if (stk.hasMoreElements())
 			logInfo.m_strTime = stk.nextToken();
 		if (stk.hasMoreElements())
-			logInfo.m_strPid = stk.nextToken().trim();		
+			logInfo.m_strPid = stk.nextToken().trim();
 		if (stk.hasMoreElements())
 			logInfo.m_strThread = stk.nextToken().trim();
 		if (stk.hasMoreElements())
-			logInfo.m_strLogLV = stk.nextToken().trim();  //Ignore process name
+			logInfo.m_strLogLV = stk.nextToken().trim(); // Ignore process name
 		if (stk.hasMoreElements())
 			logInfo.m_strLogLV = stk.nextToken().trim();
 		if (stk.hasMoreElements())
-			logInfo.m_strTag = stk.nextToken();	
+			logInfo.m_strTag = stk.nextToken();
 		if (stk.hasMoreElements()) {
 			logInfo.m_strMessage = stk.nextToken("");
 			while (stk.hasMoreElements()) {
@@ -304,7 +371,7 @@ public class LogCatParser implements ILogParser {
 		logInfo.m_TextColor = getColor(logInfo);
 		return logInfo;
 	}
-	
+
 	public LogInfo getIOS(String strText) {
 		LogInfo logInfo = new LogInfo();
 
@@ -327,25 +394,6 @@ public class LogCatParser implements ILogParser {
 		}
 		logInfo.m_TextColor = getColor(logInfo);
 
-		return logInfo;
-	}
-
-	public LogInfo getKernel(String strText) {
-		LogInfo logInfo = new LogInfo();
-
-		StringTokenizer stk = new StringTokenizer(strText, TOKEN_KERNEL, false);
-		if (stk.hasMoreElements())
-			logInfo.m_strLogLV = stk.nextToken();
-		if (stk.hasMoreElements())
-			logInfo.m_strTime = stk.nextToken();
-		if (stk.hasMoreElements()) {
-			logInfo.m_strMessage = stk.nextToken(TOKEN_KERNEL);
-			while (stk.hasMoreElements()) {
-				logInfo.m_strMessage += " " + stk.nextToken(TOKEN_SPACE);
-			}
-			logInfo.m_strMessage = logInfo.m_strMessage.replaceFirst("  ", "");
-		}
-		logInfo.m_TextColor = getColor(logInfo);
 		return logInfo;
 	}
 
@@ -379,7 +427,7 @@ public class LogCatParser implements ILogParser {
 		if (stk.hasMoreElements()) {
 			logInfo.m_strThread = stk.nextToken();
 			logInfo.m_strThread += stk.nextToken();
-		}			
+		}
 		if (stk.hasMoreElements()) {
 			logInfo.m_strMessage = stk.nextToken("");
 			while (stk.hasMoreElements()) {
@@ -402,9 +450,11 @@ public class LogCatParser implements ILogParser {
 		else if (isAos(strText))
 			return getAos(strText);
 		else if (isThreadTime(strText))
-			return getThreadTime(strText);		
+			return getThreadTime(strText);
 		else if (isIOS(strText))
 			return getIOS(strText);
+		else if (isChatPlus(strText))
+			return getChatPlus(strText);
 		else if (isKernel(strText))
 			return getKernel(strText);
 		else if (isPc(strText))
